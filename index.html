@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Location Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Syne:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0d0f12;
+    --surface: #13161b;
+    --surface2: #1a1e25;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.12);
+    --text: #e8eaed;
+    --muted: #6b7280;
+    --accent: #4ade80;
+    --accent-dim: rgba(74,222,128,0.12);
+    --warn: #fbbf24;
+    --warn-dim: rgba(251,191,36,0.12);
+    --danger: #f87171;
+    --danger-dim: rgba(248,113,113,0.12);
+    --blue: #60a5fa;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Syne', sans-serif;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 14px;
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+
+  /* ── layout ── */
+  .shell {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px 60px;
+  }
+
+  /* ── topbar ── */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 0 28px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 28px;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .brand-dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent);
+    flex-shrink: 0;
+    transition: background 0.3s, box-shadow 0.3s;
+  }
+  .brand-dot.offline { background: var(--muted); box-shadow: none; }
+  .brand-dot.loading { background: var(--warn); box-shadow: 0 0 8px var(--warn); animation: pulse 1s ease-in-out infinite; }
+  @keyframes pulse { 0%,100% { opacity:1 } 50% { opacity:0.4 } }
+  .brand-name { font-size: 16px; font-weight: 600; letter-spacing: -0.02em; }
+  .brand-sub { font-size: 11px; color: var(--muted); font-family: var(--mono); margin-top: 1px; }
+
+  .topbar-right { display: flex; align-items: center; gap: 10px; }
+  .last-update { font-size: 11px; color: var(--muted); font-family: var(--mono); }
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: var(--sans); font-size: 12px; font-weight: 500;
+    padding: 7px 14px; border-radius: 8px; cursor: pointer;
+    border: 1px solid var(--border2);
+    background: var(--surface2); color: var(--text);
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .btn:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.18); }
+  .btn svg { flex-shrink: 0; }
+  .spinning { animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── stats ── */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .stat {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px;
+  }
+  .stat-label {
+    font-size: 10px; font-weight: 500; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--muted); margin-bottom: 6px;
+  }
+  .stat-value { font-size: 26px; font-weight: 600; letter-spacing: -0.03em; color: var(--text); }
+  .stat-value.accent { color: var(--accent); }
+
+  /* ── toolbar ── */
+  .toolbar {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 14px;
+  }
+  select {
+    font-family: var(--sans); font-size: 12px; font-weight: 500;
+    padding: 7px 12px; border-radius: 8px;
+    border: 1px solid var(--border2);
+    background: var(--surface2); color: var(--text);
+    cursor: pointer; outline: none;
+    appearance: none; -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 28px;
+  }
+  select:hover { border-color: rgba(255,255,255,0.18); }
+
+  .spacer { flex: 1; }
+
+  .live-indicator {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 11px; color: var(--muted); font-family: var(--mono);
+  }
+  .live-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--accent);
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  /* ── table ── */
+  .table-wrap {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    overflow-x: auto;
+  }
+  table { width: 100%; border-collapse: collapse; min-width: 700px; }
+  thead th {
+    text-align: left; padding: 10px 14px;
+    font-size: 10px; font-weight: 500; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--muted);
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.1s;
+  }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--surface2); }
+  tbody td {
+    padding: 10px 14px;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 160px;
+  }
+  .mono { font-family: var(--mono); font-size: 12px; }
+  .muted { color: var(--muted); }
+
+  /* ── badges ── */
+  .badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 11px; font-weight: 500; padding: 2px 8px;
+    border-radius: 6px; font-family: var(--mono);
+  }
+  .badge-green { background: var(--accent-dim); color: var(--accent); }
+  .badge-yellow { background: var(--warn-dim); color: var(--warn); }
+  .badge-red { background: var(--danger-dim); color: var(--danger); }
+  .badge-blue { background: rgba(96,165,250,0.12); color: var(--blue); }
+  .badge-gray { background: rgba(255,255,255,0.06); color: var(--muted); }
+
+  /* ── empty / error state ── */
+  .empty-row td {
+    padding: 48px 20px !important;
+    text-align: center;
+    color: var(--muted);
+  }
+  .empty-icon { font-size: 28px; margin-bottom: 8px; opacity: 0.3; }
+
+  /* ── user avatar ── */
+  .user-cell { display: flex; align-items: center; gap: 8px; }
+  .avatar {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: var(--surface2); border: 1px solid var(--border2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 600; color: var(--muted);
+    flex-shrink: 0; text-transform: uppercase;
+  }
+
+  @media (max-width: 640px) {
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .topbar-right .last-update { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- topbar -->
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-dot offline" id="status-dot"></div>
+      <div>
+        <div class="brand-name">Location Tracker</div>
+        <div class="brand-sub" id="status-text">connecting…</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <span class="last-update" id="last-update"></span>
+      <button class="btn" onclick="loadData()" id="refresh-btn">
+        <svg id="refresh-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+        Refresh
+      </button>
+    </div>
+  </div>
+
+  <!-- stats -->
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-label">Total pings</div>
+      <div class="stat-value accent" id="s-total">—</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Unique users</div>
+      <div class="stat-value" id="s-users">—</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Live shares</div>
+      <div class="stat-value" id="s-live">—</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Avg accuracy</div>
+      <div class="stat-value" id="s-acc">—</div>
+    </div>
+  </div>
+
+  <!-- toolbar -->
+  <div class="toolbar">
+    <select id="user-filter" onchange="loadData()">
+      <option value="">All users</option>
+    </select>
+    <select id="limit-select" onchange="loadData()">
+      <option value="50">50 rows</option>
+      <option value="100">100 rows</option>
+      <option value="250">250 rows</option>
+      <option value="500">500 rows</option>
+    </select>
+    <div class="spacer"></div>
+    <div class="live-indicator">
+      <div class="live-dot"></div>
+      auto-refresh 10s
+    </div>
+  </div>
+
+  <!-- table -->
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:48px">ID</th>
+          <th style="width:130px">User</th>
+          <th style="width:110px">Latitude</th>
+          <th style="width:110px">Longitude</th>
+          <th style="width:100px">Accuracy</th>
+          <th style="width:80px">Heading</th>
+          <th style="width:70px">Type</th>
+          <th>Received</th>
+        </tr>
+      </thead>
+      <tbody id="table-body">
+        <tr class="empty-row"><td colspan="8">
+          <div class="empty-icon">📡</div>
+          Loading…
+        </td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<script>
+const SUPABASE_URL = 'https://hmvuqjirebjvvqholmzi.supabase.co';
+const ANON_KEY     = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhtdnVxamlyZWJqdnZxaG9sbXppIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkwNDAxMjMsImV4cCI6MjA5NDYxNjEyM30.H9pDPBJUw8Hu591BOQuTF2PQz-CrphsOKIAg_t6xdn8';
+
+const headers = { 'apikey': ANON_KEY, 'Authorization': 'Bearer ' + ANON_KEY };
+
+function accBadge(v) {
+  if (v == null) return '<span class="muted">—</span>';
+  if (v <= 10)  return `<span class="badge badge-green">▲ ${v.toFixed(1)}m</span>`;
+  if (v <= 30)  return `<span class="badge badge-yellow">◆ ${v.toFixed(1)}m</span>`;
+  return             `<span class="badge badge-red">▼ ${v.toFixed(1)}m</span>`;
+}
+
+function fmtUser(r) {
+  if (r.username)   return { label: '@' + r.username,   initials: r.username.slice(0,2).toUpperCase() };
+  const name = [r.first_name, r.last_name].filter(Boolean).join(' ');
+  if (name) return { label: name, initials: name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase() };
+  return { label: String(r.telegram_user_id), initials: '??' };
+}
+
+function fmtTime(ts) {
+  if (!ts) return '—';
+  return new Date(ts).toLocaleString(undefined, {
+    month:'short', day:'numeric',
+    hour:'2-digit', minute:'2-digit', second:'2-digit'
+  });
+}
+
+async function loadData() {
+  const dot  = document.getElementById('status-dot');
+  const icon = document.getElementById('refresh-icon');
+  dot.className = 'brand-dot loading';
+  icon.classList.add('spinning');
+
+  const limit  = document.getElementById('limit-select').value;
+  const userId = document.getElementById('user-filter').value;
+
+  let url = `${SUPABASE_URL}/rest/v1/tg_bot_phase1_raw_locations?select=*&order=received_at.desc&limit=${limit}`;
+  if (userId) url += `&telegram_user_id=eq.${userId}`;
+
+  try {
+    const res = await fetch(url, { headers });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+
+    renderTable(data);
+    updateStats(data);
+    updateUserFilter(data, userId);
+
+    dot.className = 'brand-dot';
+    document.getElementById('status-text').textContent = 'Connected · ping-collector';
+    document.getElementById('last-update').textContent = 'Updated ' + new Date().toLocaleTimeString();
+  } catch(e) {
+    dot.className = 'brand-dot offline';
+    document.getElementById('status-text').textContent = 'Error: ' + e.message;
+    document.getElementById('table-body').innerHTML =
+      `<tr class="empty-row"><td colspan="8"><div class="empty-icon">⚠️</div>${e.message}</td></tr>`;
+  }
+
+  icon.classList.remove('spinning');
+}
+
+function renderTable(rows) {
+  const tbody = document.getElementById('table-body');
+  if (!rows.length) {
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="8"><div class="empty-icon">📡</div>No pings yet — share a live location with the bot!</td></tr>';
+    return;
+  }
+  tbody.innerHTML = rows.map(r => {
+    const u = fmtUser(r);
+    return `<tr>
+      <td class="mono muted">${r.id}</td>
+      <td><div class="user-cell"><div class="avatar">${u.initials}</div><span style="font-size:13px">${u.label}</span></div></td>
+      <td class="mono">${r.latitude.toFixed(5)}</td>
+      <td class="mono">${r.longitude.toFixed(5)}</td>
+      <td>${accBadge(r.horizontal_accuracy)}</td>
+      <td class="mono muted">${r.heading != null ? r.heading + '°' : '—'}</td>
+      <td>${r.is_live
+        ? '<span class="badge badge-blue">live</span>'
+        : '<span class="badge badge-gray">static</span>'}</td>
+      <td class="mono muted" style="font-size:12px">${fmtTime(r.received_at)}</td>
+    </tr>`;
+  }).join('');
+}
+
+function updateStats(rows) {
+  document.getElementById('s-total').textContent = rows.length.toLocaleString();
+  document.getElementById('s-users').textContent = new Set(rows.map(r => r.telegram_user_id)).size;
+  document.getElementById('s-live').textContent  = rows.filter(r => r.is_live).length;
+  const acc = rows.filter(r => r.horizontal_accuracy != null);
+  document.getElementById('s-acc').textContent   = acc.length
+    ? (acc.reduce((s,r) => s + r.horizontal_accuracy, 0) / acc.length).toFixed(1) + 'm'
+    : '—';
+}
+
+function updateUserFilter(rows, current) {
+  const sel = document.getElementById('user-filter');
+  const seen = {};
+  rows.forEach(r => { if (!seen[r.telegram_user_id]) seen[r.telegram_user_id] = fmtUser(r).label; });
+  sel.innerHTML = '<option value="">All users</option>' +
+    Object.entries(seen).map(([id, name]) =>
+      `<option value="${id}" ${id == current ? 'selected' : ''}>${name}</option>`
+    ).join('');
+}
+
+loadData();
+setInterval(loadData, 10000);
+</script>
+</body>
+</html>
