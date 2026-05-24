@@ -21,8 +21,6 @@
   --mono:'DM Mono',monospace;--sans:'Syne',sans-serif;
 }
 body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;min-height:100vh;overflow-x:hidden}
-
-/* SIDEBAR */
 .sidebar{position:fixed;top:0;left:0;height:100vh;width:220px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:100}
 .logo{padding:24px 20px 20px;border-bottom:1px solid var(--border)}
 .logo-mark{display:flex;align-items:center;gap:8px;margin-bottom:4px}
@@ -38,8 +36,6 @@ nav{flex:1;padding:16px 12px;display:flex;flex-direction:column;gap:2px}
 .nav-icon{font-size:15px;width:18px;text-align:center}
 .nav-badge{margin-left:auto;font-size:10px;font-family:var(--mono);background:var(--surface3);color:var(--muted2);padding:1px 6px;border-radius:4px}
 .sidebar-footer{padding:16px;border-top:1px solid var(--border);font-size:11px;color:var(--muted);font-family:var(--mono)}
-
-/* MAIN */
 .main{margin-left:220px;min-height:100vh;display:flex;flex-direction:column}
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:18px 28px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:50}
 .page-title{font-size:17px;font-weight:600;letter-spacing:-.02em}
@@ -49,15 +45,11 @@ nav{flex:1;padding:16px 12px;display:flex;flex-direction:column;gap:2px}
 .status-dot.on{background:var(--green);box-shadow:0 0 6px var(--green);animation:pulse 2s infinite}
 .status-dot.loading{background:var(--yellow);animation:pulse .8s infinite}
 .content{flex:1;padding:24px 28px}
-
-/* STATS */
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
 .stat{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px}
 .stat-label{font-size:10px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--muted2);margin-bottom:6px}
 .stat-val{font-size:24px;font-weight:700;letter-spacing:-.03em}
-.stat-val.g{color:var(--green)}.stat-val.b{color:var(--blue)}
-
-/* TOOLBAR */
+.stat-val.g{color:var(--green)}.stat-val.b{color:var(--blue)}.stat-val.y{color:var(--yellow)}
 .toolbar{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
 select{font-family:var(--sans);font-size:12px;font-weight:500;padding:7px 12px;border-radius:8px;border:1px solid var(--border2);background:var(--surface2);color:var(--text);cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234d5966' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
 .btn{display:inline-flex;align-items:center;gap:6px;font-family:var(--sans);font-size:12px;font-weight:500;padding:7px 14px;border-radius:8px;cursor:pointer;border:1px solid var(--border2);background:var(--surface2);color:var(--text);transition:all .15s}
@@ -66,8 +58,6 @@ select{font-family:var(--sans);font-size:12px;font-weight:500;padding:7px 12px;b
 .spacer{flex:1}
 @keyframes spin{to{transform:rotate(360deg)}}
 .spinning{animation:spin .8s linear infinite}
-
-/* TABLE */
 .table-wrap{border:1px solid var(--border);border-radius:12px;overflow:hidden;overflow-x:auto}
 table{width:100%;border-collapse:collapse;min-width:600px}
 thead th{text-align:left;padding:10px 14px;font-size:10px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--muted2);background:var(--surface);border-bottom:1px solid var(--border);white-space:nowrap}
@@ -77,34 +67,34 @@ tbody tr:hover{background:var(--surface2)}
 tbody td{padding:10px 14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px}
 .mono{font-family:var(--mono);font-size:12px}
 .dim{color:var(--muted2)}
-
-/* BADGES */
 .tag{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:500;padding:2px 8px;border-radius:5px;font-family:var(--mono)}
 .tag.green{background:var(--green-dim);color:var(--green)}
 .tag.yellow{background:var(--yellow-dim);color:var(--yellow)}
 .tag.red{background:var(--red-dim);color:var(--red)}
 .tag.blue{background:var(--blue-dim);color:var(--blue)}
 .tag.gray{background:var(--surface3);color:var(--muted2)}
-.tags-row{display:flex;gap:4px}
-
-/* EMPTY */
+/* expandable batch detail */
+.expand-row td{padding:0 !important}
+.batch-detail{padding:14px 16px;background:var(--surface);border-top:1px solid var(--border);display:none}
+.batch-detail.open{display:block}
+.ping-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:6px;margin-top:10px}
+.ping-card{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-family:var(--mono);font-size:11px;display:flex;flex-direction:column;gap:3px}
+.ping-card-header{display:flex;align-items:center;justify-content:space-between}
+.ping-seq{font-weight:500;color:var(--muted2)}
+.ping-coords{color:var(--text)}
+.ping-meta{color:var(--muted2)}
 .empty{padding:48px 20px;text-align:center;color:var(--muted2)}
 .empty-icon{font-size:28px;margin-bottom:8px;opacity:.3;display:block}
-
-/* MAP */
 #map{height:460px;border-radius:12px;border:1px solid var(--border);margin-bottom:16px;overflow:hidden}
 .leaflet-container{background:#0d1117}
 .map-legend{display:flex;align-items:center;gap:16px;font-size:11px;color:var(--muted2);font-family:var(--mono);flex-wrap:wrap}
 .legend-item{display:flex;align-items:center;gap:6px}
 .legend-dot{width:10px;height:10px;border-radius:50%}
-
-/* PAGES */
 .page{display:none}.page.active{display:block}
-
-/* USER CELL */
 .user-cell{display:flex;align-items:center;gap:8px}
 .avatar{width:26px;height:26px;border-radius:50%;background:var(--surface3);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:var(--muted2);flex-shrink:0}
-
+.expand-btn{cursor:pointer;user-select:none;font-size:16px;line-height:1;color:var(--muted2);transition:transform .15s}
+.expand-btn.open{transform:rotate(90deg);color:var(--blue)}
 @media(max-width:768px){
   .sidebar{width:60px}
   .logo-name,.logo-sub,.nav-item span,.nav-badge,.sidebar-footer{display:none}
@@ -123,20 +113,16 @@ tbody td{padding:10px 14px;white-space:nowrap;overflow:hidden;text-overflow:elli
       <div class="logo-dot off" id="logo-dot"></div>
       <div class="logo-name">TMS</div>
     </div>
-    <div class="logo-sub">TRACKER v0.3</div>
+    <div class="logo-sub">TRACKER v0.4</div>
   </div>
   <nav>
     <div class="nav-item active" onclick="showPage('raw')" id="nav-raw">
       <span class="nav-icon">📡</span><span>Raw Pings</span>
       <span class="nav-badge" id="badge-raw">—</span>
     </div>
-    <div class="nav-item" onclick="showPage('windows')" id="nav-windows">
-      <span class="nav-icon">🪟</span><span>Windows</span>
-      <span class="nav-badge" id="badge-windows">—</span>
-    </div>
-    <div class="nav-item" onclick="showPage('permanent')" id="nav-permanent">
-      <span class="nav-icon">🏁</span><span>Permanent</span>
-      <span class="nav-badge" id="badge-permanent">—</span>
+    <div class="nav-item" onclick="showPage('batches')" id="nav-batches">
+      <span class="nav-icon">📦</span><span>Batches</span>
+      <span class="nav-badge" id="badge-batches">—</span>
     </div>
     <div class="nav-item" onclick="showPage('map')" id="nav-map">
       <span class="nav-icon">🗺</span><span>Map</span>
@@ -153,7 +139,7 @@ tbody td{padding:10px 14px;white-space:nowrap;overflow:hidden;text-overflow:elli
         <div class="status-dot loading" id="status-dot"></div>
         <span id="status-text">connecting…</span>
       </div>
-      <button class="btn primary" onclick="loadAll()" id="refresh-btn">
+      <button class="btn primary" onclick="loadAll()">
         <svg id="refresh-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
         Refresh
       </button>
@@ -163,84 +149,73 @@ tbody td{padding:10px 14px;white-space:nowrap;overflow:hidden;text-overflow:elli
   <div class="content">
     <div class="stats">
       <div class="stat"><div class="stat-label">Raw pings</div><div class="stat-val b" id="s-raw">—</div></div>
-      <div class="stat"><div class="stat-label">5-min windows</div><div class="stat-val" id="s-windows">—</div></div>
-      <div class="stat"><div class="stat-label">Permanent rows</div><div class="stat-val g" id="s-perm">—</div></div>
-      <div class="stat"><div class="stat-label">Avg accuracy</div><div class="stat-val" id="s-acc">—</div></div>
+      <div class="stat"><div class="stat-label">Batches received</div><div class="stat-val y" id="s-batches">—</div></div>
+      <div class="stat"><div class="stat-label">Unique drivers</div><div class="stat-val" id="s-drivers">—</div></div>
+      <div class="stat"><div class="stat-label">Avg accuracy</div><div class="stat-val g" id="s-acc">—</div></div>
     </div>
 
-    <!-- RAW -->
+    <!-- RAW PINGS -->
     <div class="page active" id="page-raw">
       <div class="toolbar">
-        <select id="raw-user" onchange="renderRaw()"><option value="">All users</option></select>
+        <select id="raw-user" onchange="renderRaw()"><option value="">All drivers</option></select>
         <select id="raw-limit" onchange="loadRaw()">
-          <option value="100">100 rows</option><option value="250">250 rows</option><option value="500">500 rows</option>
+          <option value="100">100 rows</option>
+          <option value="250">250 rows</option>
+          <option value="500">500 rows</option>
         </select>
         <div class="spacer"></div>
         <span style="font-size:11px;color:var(--muted2);font-family:var(--mono)">● auto 10s</span>
       </div>
       <div class="table-wrap"><table>
         <thead><tr>
-          <th style="width:48px">ID</th><th style="width:130px">User</th>
-          <th style="width:105px">Latitude</th><th style="width:105px">Longitude</th>
-          <th style="width:95px">Accuracy</th><th style="width:75px">Heading</th>
-          <th style="width:65px">Type</th><th>Received</th>
+          <th style="width:48px">ID</th>
+          <th style="width:140px">Driver</th>
+          <th style="width:105px">Latitude</th>
+          <th style="width:105px">Longitude</th>
+          <th style="width:95px">Accuracy</th>
+          <th style="width:75px">Heading</th>
+          <th style="width:65px">Type</th>
+          <th>Received</th>
         </tr></thead>
         <tbody id="raw-body"><tr><td colspan="8" class="empty"><span class="empty-icon">📡</span>Loading…</td></tr></tbody>
       </table></div>
     </div>
 
-    <!-- WINDOWS -->
-    <div class="page" id="page-windows">
+    <!-- BATCHES -->
+    <div class="page" id="page-batches">
       <div class="toolbar">
-        <select id="win-user" onchange="renderWindows()"><option value="">All users</option></select>
-        <select id="win-filter" onchange="renderWindows()">
-          <option value="">All tags</option><option value="green">🟢 Green</option>
-          <option value="yellow">🟡 Yellow</option><option value="red">🔴 Red</option>
-        </select>
+        <select id="batch-user" onchange="renderBatches()"><option value="">All drivers</option></select>
         <div class="spacer"></div>
+        <span style="font-size:11px;color:var(--muted2);font-family:var(--mono)">› click row to expand pings</span>
       </div>
-      <div class="table-wrap"><table>
+      <div class="table-wrap"><table id="batch-table">
         <thead><tr>
-          <th style="width:48px">ID</th><th style="width:130px">User</th>
-          <th style="width:90px">Tag</th><th style="width:85px">Speed</th>
-          <th style="width:105px">Latitude</th><th style="width:105px">Longitude</th>
-          <th style="width:55px">Pings</th><th style="width:70px">Merged</th><th>Window</th>
+          <th style="width:32px"></th>
+          <th style="width:140px">Driver</th>
+          <th style="width:60px">Pings</th>
+          <th style="width:150px">Batch start</th>
+          <th style="width:150px">Batch end</th>
+          <th style="width:80px">Duration</th>
+          <th>Received at</th>
         </tr></thead>
-        <tbody id="win-body"><tr><td colspan="9" class="empty"><span class="empty-icon">🪟</span>Loading…</td></tr></tbody>
-      </table></div>
-    </div>
-
-    <!-- PERMANENT -->
-    <div class="page" id="page-permanent">
-      <div class="toolbar">
-        <select id="perm-user" onchange="renderPermanent()"><option value="">All users</option></select>
-        <div class="spacer"></div>
-      </div>
-      <div class="table-wrap"><table>
-        <thead><tr>
-          <th style="width:48px">ID</th><th style="width:130px">User</th>
-          <th style="width:120px">Tags</th><th style="width:90px">Avg Speed</th>
-          <th style="width:105px">Latitude</th><th style="width:105px">Longitude</th><th>Period</th>
-        </tr></thead>
-        <tbody id="perm-body"><tr><td colspan="7" class="empty"><span class="empty-icon">🏁</span>Loading…</td></tr></tbody>
+        <tbody id="batch-body"><tr><td colspan="7" class="empty"><span class="empty-icon">📦</span>Loading…</td></tr></tbody>
       </table></div>
     </div>
 
     <!-- MAP -->
     <div class="page" id="page-map">
       <div class="toolbar">
-        <select id="map-user" onchange="renderMap()"><option value="">All users</option></select>
+        <select id="map-user" onchange="renderMap()"><option value="">All drivers</option></select>
         <select id="map-source" onchange="renderMap()">
           <option value="raw">Raw pings</option>
-          <option value="windows">5-min windows</option>
-          <option value="permanent">Permanent</option>
+          <option value="batches">Batch pings</option>
         </select>
       </div>
       <div id="map"></div>
       <div class="map-legend">
         <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>Green ≤10m</div>
         <div class="legend-item"><div class="legend-dot" style="background:var(--yellow)"></div>Yellow 11–30m</div>
-        <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div>Red >30m</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div>Red &gt;30m</div>
         <div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div>No data</div>
       </div>
     </div>
@@ -251,23 +226,49 @@ tbody td{padding:10px 14px;white-space:nowrap;overflow:hidden;text-overflow:elli
 const SUPABASE_URL='https://hmvuqjirebjvvqholmzi.supabase.co';
 const ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhtdnVxamlyZWJqdnZxaG9sbXppIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkwNDAxMjMsImV4cCI6MjA5NDYxNjEyM30.H9pDPBJUw8Hu591BOQuTF2PQz-CrphsOKIAg_t6xdn8';
 const H={'apikey':ANON_KEY,'Authorization':'Bearer '+ANON_KEY};
-let rawData=[],winData=[],permData=[],mapInstance=null,mapLayers=[];
 
+let rawData=[], batchData=[], mapInstance=null, mapLayers=[];
 const q=id=>document.getElementById(id);
 
-function fmtUser(r){
-  const u=r.username?'@'+r.username:[r.first_name,r.last_name].filter(Boolean).join(' ')||String(r.telegram_user_id);
+// ── Formatters ─────────────────────────────────────────────────────────────
+function fmtDriver(r){
+  const u=r.username?'@'+r.username
+    :[r.first_name,r.last_name].filter(Boolean).join(' ')
+    ||String(r.telegram_user_id||r.driver_id||'?');
   return{label:u,init:u.replace('@','').slice(0,2).toUpperCase()};
 }
-function fmtTime(ts){if(!ts)return'—';return new Date(ts).toLocaleString(undefined,{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'})}
-function fmtSpan(s,e){if(!s||!e)return'—';return new Date(s).toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'})+' → '+new Date(e).toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'})}
-function accBadge(v){if(v==null)return'<span class="tag blue">?</span>';if(v>300)return`<span class="tag red">▼${v}m</span>`;if(v<=10)return`<span class="tag green">▲${v}m</span>`;if(v<=30)return`<span class="tag yellow">◆${v}m</span>`;return`<span class="tag red">▼${v}m</span>`}
-function tagBadge(t){const m={green:'<span class="tag green">●</span>',yellow:'<span class="tag yellow">●</span>',red:'<span class="tag red">●</span>'};return m[t]||'<span class="tag gray">—</span>'}
-function userCell(r){const u=fmtUser(r);return`<div class="user-cell"><div class="avatar">${u.init}</div><span>${u.label}</span></div>`}
-function accColor(a){if(a==null)return'#4da6ff';if(a<=10)return'#3dd68c';if(a<=30)return'#f5c842';return'#f0544f'}
-function tagColor(t){return{green:'#3dd68c',yellow:'#f5c842',red:'#f0544f'}[t]||'#4da6ff'}
+function fmtTime(ts){
+  if(!ts)return'—';
+  return new Date(ts).toLocaleString(undefined,{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+function durStr(s,e){
+  if(!s||!e)return'—';
+  const sec=Math.round((new Date(e)-new Date(s))/1000);
+  return sec>=60?Math.floor(sec/60)+'m '+(sec%60)+'s':sec+'s';
+}
+function accColor(a){
+  if(a==null)return'#4da6ff';
+  if(a<=10)return'#3dd68c';
+  if(a<=30)return'#f5c842';
+  return'#f0544f';
+}
+function accBadge(v){
+  if(v==null)return'<span class="tag blue">?</span>';
+  if(v>300)return`<span class="tag red">▼${v}m</span>`;
+  if(v<=10)return`<span class="tag green">▲${Number(v).toFixed(1)}m</span>`;
+  if(v<=30)return`<span class="tag yellow">◆${Number(v).toFixed(1)}m</span>`;
+  return`<span class="tag red">▼${Number(v).toFixed(1)}m</span>`;
+}
+function tagBadge(t){
+  return{green:'<span class="tag green">●</span>',yellow:'<span class="tag yellow">●</span>',red:'<span class="tag red">●</span>'}[t]||'<span class="tag gray">—</span>';
+}
+function userCell(r){
+  const u=fmtDriver(r);
+  return`<div class="user-cell"><div class="avatar">${u.init}</div><span>${u.label}</span></div>`;
+}
 
-const pageTitles={raw:'Raw Pings',windows:'5-Min Windows',permanent:'Permanent Records',map:'Location Map'};
+// ── Navigation ─────────────────────────────────────────────────────────────
+const pageTitles={raw:'Raw Pings',batches:'5-Min Batches',map:'Location Map'};
 function showPage(name){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
@@ -277,138 +278,204 @@ function showPage(name){
   if(name==='map')initMap();
 }
 
-async function fetchTable(table,params=''){
+// ── Fetch ──────────────────────────────────────────────────────────────────
+async function fetchTable(table,params){
   const res=await fetch(`${SUPABASE_URL}/rest/v1/${table}?${params}`,{headers:H});
-  if(!res.ok)throw new Error('HTTP '+res.status);
+  if(!res.ok)throw new Error(`${table}: HTTP ${res.status}`);
   return res.json();
 }
-
-async function loadRaw(){rawData=await fetchTable('tg_bot_phase1_raw_locations',`select=*&order=received_at.desc&limit=${q('raw-limit')?.value||100}`);renderRaw()}
-async function loadWindows(){winData=await fetchTable('tg_bot_phase2_windows','select=*&order=window_start.desc&limit=200');renderWindows()}
-async function loadPermanent(){permData=await fetchTable('tg_bot_phase3_permanent','select=*&order=period_start.desc&limit=200');renderPermanent()}
-
+async function loadRaw(){
+  rawData=await fetchTable('tg_bot_phase1_raw_locations',
+    `select=*&order=received_at.desc&limit=${q('raw-limit')?.value||100}`);
+  renderRaw();
+}
+async function loadBatches(){
+  batchData=await fetchTable('raw_batches','select=*&order=received_at.desc&limit=100');
+  renderBatches();
+}
 async function loadAll(){
   const dot=q('status-dot'),icon=q('refresh-icon');
   dot.className='status-dot loading';icon.classList.add('spinning');
   try{
-    await Promise.all([loadRaw(),loadWindows(),loadPermanent()]);
-    updateStats();syncUserFilters();
+    await Promise.all([loadRaw(),loadBatches()]);
+    updateStats();syncDriverFilters();
+    if(mapInstance)renderMap();
     dot.className='status-dot on';
     q('status-text').textContent='Connected · ping-collector';
     q('logo-dot').className='logo-dot';
     q('last-update').textContent='↻ '+new Date().toLocaleTimeString();
   }catch(e){
-    dot.className='status-dot';q('status-text').textContent='Error: '+e.message;
+    dot.className='status-dot';
+    q('status-text').textContent='Error: '+e.message;
     q('logo-dot').className='logo-dot off';
+    console.error(e);
   }
   icon.classList.remove('spinning');
 }
 
+// ── Stats ──────────────────────────────────────────────────────────────────
 function updateStats(){
   q('s-raw').textContent=rawData.length.toLocaleString();
-  q('s-windows').textContent=winData.length.toLocaleString();
-  q('s-perm').textContent=permData.length.toLocaleString();
+  q('s-batches').textContent=batchData.length.toLocaleString();
+  const drivers=new Set([
+    ...rawData.map(r=>r.telegram_user_id),
+    ...batchData.map(r=>r.driver_id)
+  ]).size;
+  q('s-drivers').textContent=drivers;
   const acc=rawData.filter(r=>r.horizontal_accuracy!=null);
-  q('s-acc').textContent=acc.length?(acc.reduce((s,r)=>s+r.horizontal_accuracy,0)/acc.length).toFixed(1)+'m':'—';
+  q('s-acc').textContent=acc.length
+    ?(acc.reduce((s,r)=>s+r.horizontal_accuracy,0)/acc.length).toFixed(1)+'m'
+    :'—';
   q('badge-raw').textContent=rawData.length;
-  q('badge-windows').textContent=winData.length;
-  q('badge-permanent').textContent=permData.length;
+  q('badge-batches').textContent=batchData.length;
 }
 
-function syncUserFilters(){
-  const users={};
-  rawData.forEach(r=>{if(!users[r.telegram_user_id])users[r.telegram_user_id]=fmtUser(r).label});
-  ['raw-user','win-user','perm-user','map-user'].forEach(id=>{
+// ── Driver filter sync ─────────────────────────────────────────────────────
+function syncDriverFilters(){
+  const drivers={};
+  rawData.forEach(r=>{if(!drivers[r.telegram_user_id])drivers[r.telegram_user_id]=fmtDriver(r).label});
+  batchData.forEach(r=>{if(!drivers[r.driver_id])drivers[r.driver_id]=fmtDriver({...r,telegram_user_id:r.driver_id}).label});
+  ['raw-user','batch-user','map-user'].forEach(id=>{
     const sel=q(id);if(!sel)return;
     const cur=sel.value;
-    sel.innerHTML='<option value="">All users</option>'+Object.entries(users).map(([id,name])=>`<option value="${id}" ${id==cur?'selected':''}>${name}</option>`).join('');
+    sel.innerHTML='<option value="">All drivers</option>'+
+      Object.entries(drivers).map(([id,name])=>
+        `<option value="${id}" ${id==cur?'selected':''}>${name}</option>`
+      ).join('');
   });
 }
 
+// ── Render: Raw Pings ──────────────────────────────────────────────────────
 function renderRaw(){
   const uid=q('raw-user').value;
   const rows=uid?rawData.filter(r=>String(r.telegram_user_id)===uid):rawData;
   const tbody=q('raw-body');
-  if(!rows.length){tbody.innerHTML=`<tr><td colspan="8" class="empty"><span class="empty-icon">📡</span>No pings yet</td></tr>`;return}
-  tbody.innerHTML=rows.map(r=>`<tr>
-    <td class="mono dim">${r.id}</td><td>${userCell(r)}</td>
-    <td class="mono">${r.latitude.toFixed(5)}</td><td class="mono">${r.longitude.toFixed(5)}</td>
-    <td>${accBadge(r.horizontal_accuracy)}</td>
-    <td class="mono dim">${r.heading!=null?r.heading+'°':'—'}</td>
-    <td>${r.is_live?'<span class="tag blue">live</span>':'<span class="tag gray">static</span>'}</td>
-    <td class="mono dim" style="font-size:11px">${fmtTime(r.received_at)}</td>
-  </tr>`).join('');
+  if(!rows.length){
+    tbody.innerHTML=`<tr><td colspan="8" class="empty"><span class="empty-icon">📡</span>No pings yet — share a live location with the bot</td></tr>`;
+    return;
+  }
+  tbody.innerHTML=rows.map(r=>`
+    <tr>
+      <td class="mono dim">${r.id}</td>
+      <td>${userCell(r)}</td>
+      <td class="mono">${Number(r.latitude).toFixed(5)}</td>
+      <td class="mono">${Number(r.longitude).toFixed(5)}</td>
+      <td>${accBadge(r.horizontal_accuracy)}</td>
+      <td class="mono dim">${r.heading!=null?r.heading+'°':'—'}</td>
+      <td>${r.is_live?'<span class="tag blue">live</span>':'<span class="tag gray">static</span>'}</td>
+      <td class="mono dim" style="font-size:11px">${fmtTime(r.received_at)}</td>
+    </tr>`).join('');
 }
 
-function renderWindows(){
-  const uid=q('win-user').value,tag=q('win-filter').value;
-  let rows=winData;
-  if(uid)rows=rows.filter(r=>String(r.telegram_user_id)===uid);
-  if(tag)rows=rows.filter(r=>r.accuracy_tag===tag);
-  const tbody=q('win-body');
-  if(!rows.length){tbody.innerHTML=`<tr><td colspan="9" class="empty"><span class="empty-icon">🪟</span>No windows yet — bot needs to flush a 5-min batch first</td></tr>`;return}
-  tbody.innerHTML=rows.map(r=>`<tr>
-    <td class="mono dim">${r.id}</td><td>${userCell(r)}</td>
-    <td>${tagBadge(r.accuracy_tag)}<span class="dim mono" style="font-size:11px;margin-left:4px">${r.accuracy_tag}</span></td>
-    <td class="mono">${r.speed_mph!=null?r.speed_mph.toFixed(1)+' mph':'—'}</td>
-    <td class="mono">${r.latitude.toFixed(5)}</td><td class="mono">${r.longitude.toFixed(5)}</td>
-    <td class="mono dim">${r.ping_count}</td>
-    <td>${r.merged_into?`<span class="tag green">#${r.merged_into}</span>`:'<span class="tag gray">no</span>'}</td>
-    <td class="mono dim" style="font-size:11px">${fmtSpan(r.window_start,r.window_end)}</td>
-  </tr>`).join('');
+// ── Render: Batches ────────────────────────────────────────────────────────
+function renderBatches(){
+  const uid=q('batch-user').value;
+  const rows=uid?batchData.filter(r=>String(r.driver_id)===uid):batchData;
+  const tbody=q('batch-body');
+  if(!rows.length){
+    tbody.innerHTML=`<tr><td colspan="7" class="empty"><span class="empty-icon">📦</span>No batches yet — bot flushes every 5 min</td></tr>`;
+    return;
+  }
+  tbody.innerHTML=rows.map(r=>{
+    const pings=Array.isArray(r.pings)?r.pings:[];
+    // build ping cards
+    const cards=pings.map(p=>{
+      const coords=p.point?.coordinates;
+      const lon=coords?Number(coords[0]).toFixed(5):'?';
+      const lat=coords?Number(coords[1]).toFixed(5):'?';
+      return`<div class="ping-card">
+        <div class="ping-card-header">
+          <span class="ping-seq">#${p.seq}</span>
+          ${tagBadge(p.acc_tag)}
+        </div>
+        <div class="ping-coords">${lat}, ${lon}</div>
+        <div class="ping-meta">${p.accuracy!=null?p.accuracy+'m acc':''} ${p.heading!=null?'· '+p.heading+'°':''} · ${p.ts?new Date(p.ts).toLocaleTimeString():'?'}</div>
+      </div>`;
+    }).join('');
+
+    return`
+      <tr onclick="toggleBatch('${r.id}')" style="cursor:pointer">
+        <td><span class="expand-btn" id="arr-${r.id}">›</span></td>
+        <td>${userCell({...r,telegram_user_id:r.driver_id})}</td>
+        <td><span class="tag blue">${r.ping_count}</span></td>
+        <td class="mono dim" style="font-size:11px">${fmtTime(r.batch_started_at)}</td>
+        <td class="mono dim" style="font-size:11px">${fmtTime(r.batch_ended_at)}</td>
+        <td class="mono dim">${durStr(r.batch_started_at,r.batch_ended_at)}</td>
+        <td class="mono dim" style="font-size:11px">${fmtTime(r.received_at)}</td>
+      </tr>
+      <tr class="expand-row" id="expand-${r.id}" style="display:none">
+        <td colspan="7">
+          <div class="batch-detail open">
+            <span style="font-size:11px;color:var(--muted2);font-family:var(--mono)">${pings.length} pings · ${r.batch_started_at?new Date(r.batch_started_at).toLocaleTimeString():''} → ${r.batch_ended_at?new Date(r.batch_ended_at).toLocaleTimeString():''}</span>
+            <div class="ping-grid">${cards||'<span style="color:var(--muted2);font-size:12px;font-family:var(--mono)">No ping detail available</span>'}</div>
+          </div>
+        </td>
+      </tr>`;
+  }).join('');
 }
 
-function renderPermanent(){
-  const uid=q('perm-user').value;
-  const rows=uid?permData.filter(r=>String(r.telegram_user_id)===uid):permData;
-  const tbody=q('perm-body');
-  if(!rows.length){tbody.innerHTML=`<tr><td colspan="7" class="empty"><span class="empty-icon">🏁</span>No permanent records yet — need 3 windows to merge</td></tr>`;return}
-  tbody.innerHTML=rows.map(r=>`<tr>
-    <td class="mono dim">${r.id}</td><td>${userCell(r)}</td>
-    <td><div class="tags-row">${tagBadge(r.window1_tag)}${tagBadge(r.window2_tag)}${tagBadge(r.window3_tag)}</div></td>
-    <td class="mono">${r.speed_mph!=null?r.speed_mph.toFixed(1)+' mph':'—'}</td>
-    <td class="mono">${r.latitude.toFixed(5)}</td><td class="mono">${r.longitude.toFixed(5)}</td>
-    <td class="mono dim" style="font-size:11px">${fmtSpan(r.period_start,r.period_end)}</td>
-  </tr>`).join('');
+function toggleBatch(id){
+  const row=q('expand-'+id), btn=q('arr-'+id);
+  if(!row)return;
+  const open=row.style.display==='table-row';
+  row.style.display=open?'none':'table-row';
+  if(btn){btn.classList.toggle('open',!open);}
 }
 
+// ── Map ────────────────────────────────────────────────────────────────────
 function initMap(){
   if(mapInstance)return;
   mapInstance=L.map('map');
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'© OpenStreetMap © CARTO',maxZoom:19}).addTo(mapInstance);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+    {attribution:'© OpenStreetMap © CARTO',maxZoom:19}).addTo(mapInstance);
   renderMap();
 }
 
 function renderMap(){
   if(!mapInstance)return;
-  mapLayers.forEach(l=>mapInstance.removeLayer(l));mapLayers=[];
-  const uid=q('map-user').value,source=q('map-source').value;
+  mapLayers.forEach(l=>mapInstance.removeLayer(l));
+  mapLayers=[];
+  const uid=q('map-user').value;
+  const source=q('map-source').value;
   let points=[];
 
   if(source==='raw'){
     let rows=uid?rawData.filter(r=>String(r.telegram_user_id)===uid):rawData;
     const coords=[...rows].reverse().map(r=>[r.latitude,r.longitude]);
-    if(coords.length>1){const l=L.polyline(coords,{color:'rgba(77,166,255,0.2)',weight:1.5}).addTo(mapInstance);mapLayers.push(l)}
+    if(coords.length>1){
+      const l=L.polyline(coords,{color:'rgba(77,166,255,0.2)',weight:1.5}).addTo(mapInstance);
+      mapLayers.push(l);
+    }
     rows.forEach(r=>{
-      const c=L.circleMarker([r.latitude,r.longitude],{radius:4,fillColor:accColor(r.horizontal_accuracy),color:'transparent',fillOpacity:.8})
-        .bindPopup(`<b>${fmtUser(r).label}</b><br>Acc: ${r.horizontal_accuracy??'?'}m<br>${fmtTime(r.received_at)}`);
-      c.addTo(mapInstance);mapLayers.push(c);points.push([r.latitude,r.longitude]);
-    });
-  } else if(source==='windows'){
-    let rows=uid?winData.filter(r=>String(r.telegram_user_id)===uid):winData;
-    const coords=[...rows].reverse().map(r=>[r.latitude,r.longitude]);
-    if(coords.length>1){const l=L.polyline(coords,{color:'rgba(255,255,255,0.1)',weight:1.5,dashArray:'4'}).addTo(mapInstance);mapLayers.push(l)}
-    rows.forEach(r=>{
-      const c=L.circleMarker([r.latitude,r.longitude],{radius:8,fillColor:tagColor(r.accuracy_tag),color:tagColor(r.accuracy_tag),weight:2,fillOpacity:.7})
-        .bindPopup(`<b>${r.accuracy_tag.toUpperCase()}</b><br>${r.speed_mph!=null?r.speed_mph.toFixed(1)+' mph':'?'} · ${r.ping_count} pings<br>${fmtSpan(r.window_start,r.window_end)}`);
-      c.addTo(mapInstance);mapLayers.push(c);points.push([r.latitude,r.longitude]);
+      const c=L.circleMarker([r.latitude,r.longitude],{
+        radius:4,fillColor:accColor(r.horizontal_accuracy),color:'transparent',fillOpacity:.85
+      }).bindPopup(`<b>${fmtDriver(r).label}</b><br>Acc: ${r.horizontal_accuracy??'?'}m<br>${fmtTime(r.received_at)}`);
+      c.addTo(mapInstance);mapLayers.push(c);
+      points.push([r.latitude,r.longitude]);
     });
   } else {
-    let rows=uid?permData.filter(r=>String(r.telegram_user_id)===uid):permData;
-    rows.forEach(r=>{
-      const c=L.circleMarker([r.latitude,r.longitude],{radius:10,fillColor:'#4da6ff',color:'#4da6ff',weight:2,fillOpacity:.7})
-        .bindPopup(`<b>${r.speed_mph!=null?r.speed_mph.toFixed(1)+' mph':'?'}</b><br>${r.window1_tag} / ${r.window2_tag} / ${r.window3_tag}<br>${fmtSpan(r.period_start,r.period_end)}`);
-      c.addTo(mapInstance);mapLayers.push(c);points.push([r.latitude,r.longitude]);
+    // Plot individual pings from each batch's GeoJSON
+    let rows=uid?batchData.filter(r=>String(r.driver_id)===uid):batchData;
+    rows.forEach(batch=>{
+      const pings=Array.isArray(batch.pings)?batch.pings:[];
+      const coords=pings.map(p=>{
+        const c=p.point?.coordinates;
+        return c?[c[1],c[0]]:null; // GeoJSON is [lon,lat], Leaflet is [lat,lon]
+      }).filter(Boolean);
+      if(coords.length>1){
+        const l=L.polyline(coords,{color:'rgba(245,200,66,0.25)',weight:1.5,dashArray:'3'}).addTo(mapInstance);
+        mapLayers.push(l);
+      }
+      pings.forEach(p=>{
+        const c=p.point?.coordinates;
+        if(!c)return;
+        const latlon=[c[1],c[0]];
+        const marker=L.circleMarker(latlon,{
+          radius:5,fillColor:accColor(p.accuracy),color:'transparent',fillOpacity:.85
+        }).bindPopup(`<b>Ping #${p.seq}</b><br>${p.acc_tag??'?'} · ${p.accuracy??'?'}m<br>${p.heading!=null?p.heading+'° · ':''} ${p.ts?new Date(p.ts).toLocaleTimeString():''}`);
+        marker.addTo(mapInstance);mapLayers.push(marker);
+        points.push(latlon);
+      });
     });
   }
   if(points.length)mapInstance.fitBounds(L.latLngBounds(points),{padding:[30,30]});
