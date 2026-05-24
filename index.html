@@ -3,396 +3,419 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Location Tracker</title>
+<title>TMS — Location Tracker</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Syne:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080a0d;--surface:#0f1318;--surface2:#161b22;--surface3:#1e242d;
+  --border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.1);
+  --text:#dde2e8;--muted:#4d5966;--muted2:#7a8694;
+  --green:#3dd68c;--green-dim:rgba(61,214,140,0.1);
+  --yellow:#f5c842;--yellow-dim:rgba(245,200,66,0.1);
+  --red:#f0544f;--red-dim:rgba(240,84,79,0.1);
+  --blue:#4da6ff;--blue-dim:rgba(77,166,255,0.1);
+  --mono:'DM Mono',monospace;--sans:'Syne',sans-serif;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;min-height:100vh;overflow-x:hidden}
 
-  :root {
-    --bg: #0d0f12;
-    --surface: #13161b;
-    --surface2: #1a1e25;
-    --border: rgba(255,255,255,0.07);
-    --border2: rgba(255,255,255,0.12);
-    --text: #e8eaed;
-    --muted: #6b7280;
-    --accent: #4ade80;
-    --accent-dim: rgba(74,222,128,0.12);
-    --warn: #fbbf24;
-    --warn-dim: rgba(251,191,36,0.12);
-    --danger: #f87171;
-    --danger-dim: rgba(248,113,113,0.12);
-    --blue: #60a5fa;
-    --mono: 'JetBrains Mono', monospace;
-    --sans: 'Syne', sans-serif;
-  }
+/* SIDEBAR */
+.sidebar{position:fixed;top:0;left:0;height:100vh;width:220px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:100}
+.logo{padding:24px 20px 20px;border-bottom:1px solid var(--border)}
+.logo-mark{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.logo-dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);animation:pulse 2s ease-in-out infinite}
+.logo-dot.off{background:var(--muted);box-shadow:none;animation:none}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.logo-name{font-size:15px;font-weight:700;letter-spacing:-.02em}
+.logo-sub{font-size:10px;color:var(--muted2);font-family:var(--mono);letter-spacing:.05em}
+nav{flex:1;padding:16px 12px;display:flex;flex-direction:column;gap:2px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;color:var(--muted2);transition:all .15s;border:1px solid transparent}
+.nav-item:hover{background:var(--surface2);color:var(--text)}
+.nav-item.active{background:var(--surface3);color:var(--text);border-color:var(--border2)}
+.nav-icon{font-size:15px;width:18px;text-align:center}
+.nav-badge{margin-left:auto;font-size:10px;font-family:var(--mono);background:var(--surface3);color:var(--muted2);padding:1px 6px;border-radius:4px}
+.sidebar-footer{padding:16px;border-top:1px solid var(--border);font-size:11px;color:var(--muted);font-family:var(--mono)}
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--sans);
-    font-size: 14px;
-    min-height: 100vh;
-    line-height: 1.6;
-  }
+/* MAIN */
+.main{margin-left:220px;min-height:100vh;display:flex;flex-direction:column}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:18px 28px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:50}
+.page-title{font-size:17px;font-weight:600;letter-spacing:-.02em}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.status-pill{display:flex;align-items:center;gap:6px;font-size:11px;font-family:var(--mono);color:var(--muted2);background:var(--surface);border:1px solid var(--border2);padding:5px 10px;border-radius:20px}
+.status-dot{width:6px;height:6px;border-radius:50%;background:var(--muted);transition:background .3s}
+.status-dot.on{background:var(--green);box-shadow:0 0 6px var(--green);animation:pulse 2s infinite}
+.status-dot.loading{background:var(--yellow);animation:pulse .8s infinite}
+.content{flex:1;padding:24px 28px}
 
-  /* ── layout ── */
-  .shell {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 24px 60px;
-  }
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px}
+.stat-label{font-size:10px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--muted2);margin-bottom:6px}
+.stat-val{font-size:24px;font-weight:700;letter-spacing:-.03em}
+.stat-val.g{color:var(--green)}.stat-val.b{color:var(--blue)}
 
-  /* ── topbar ── */
-  .topbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 20px 0 28px;
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 28px;
-  }
-  .brand { display: flex; align-items: center; gap: 10px; }
-  .brand-dot {
-    width: 10px; height: 10px; border-radius: 50%;
-    background: var(--accent);
-    box-shadow: 0 0 8px var(--accent);
-    flex-shrink: 0;
-    transition: background 0.3s, box-shadow 0.3s;
-  }
-  .brand-dot.offline { background: var(--muted); box-shadow: none; }
-  .brand-dot.loading { background: var(--warn); box-shadow: 0 0 8px var(--warn); animation: pulse 1s ease-in-out infinite; }
-  @keyframes pulse { 0%,100% { opacity:1 } 50% { opacity:0.4 } }
-  .brand-name { font-size: 16px; font-weight: 600; letter-spacing: -0.02em; }
-  .brand-sub { font-size: 11px; color: var(--muted); font-family: var(--mono); margin-top: 1px; }
+/* TOOLBAR */
+.toolbar{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+select{font-family:var(--sans);font-size:12px;font-weight:500;padding:7px 12px;border-radius:8px;border:1px solid var(--border2);background:var(--surface2);color:var(--text);cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234d5966' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
+.btn{display:inline-flex;align-items:center;gap:6px;font-family:var(--sans);font-size:12px;font-weight:500;padding:7px 14px;border-radius:8px;cursor:pointer;border:1px solid var(--border2);background:var(--surface2);color:var(--text);transition:all .15s}
+.btn:hover{background:var(--surface3)}
+.btn.primary{background:var(--blue-dim);border-color:rgba(77,166,255,.3);color:var(--blue)}
+.spacer{flex:1}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinning{animation:spin .8s linear infinite}
 
-  .topbar-right { display: flex; align-items: center; gap: 10px; }
-  .last-update { font-size: 11px; color: var(--muted); font-family: var(--mono); }
-  .btn {
-    display: inline-flex; align-items: center; gap: 6px;
-    font-family: var(--sans); font-size: 12px; font-weight: 500;
-    padding: 7px 14px; border-radius: 8px; cursor: pointer;
-    border: 1px solid var(--border2);
-    background: var(--surface2); color: var(--text);
-    transition: background 0.15s, border-color 0.15s;
-  }
-  .btn:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.18); }
-  .btn svg { flex-shrink: 0; }
-  .spinning { animation: spin 0.8s linear infinite; }
-  @keyframes spin { to { transform: rotate(360deg); } }
+/* TABLE */
+.table-wrap{border:1px solid var(--border);border-radius:12px;overflow:hidden;overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:600px}
+thead th{text-align:left;padding:10px 14px;font-size:10px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--muted2);background:var(--surface);border-bottom:1px solid var(--border);white-space:nowrap}
+tbody tr{border-bottom:1px solid var(--border);transition:background .1s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:var(--surface2)}
+tbody td{padding:10px 14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px}
+.mono{font-family:var(--mono);font-size:12px}
+.dim{color:var(--muted2)}
 
-  /* ── stats ── */
-  .stats {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-    margin-bottom: 24px;
-  }
-  .stat {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 16px 18px;
-  }
-  .stat-label {
-    font-size: 10px; font-weight: 500; letter-spacing: 0.08em;
-    text-transform: uppercase; color: var(--muted); margin-bottom: 6px;
-  }
-  .stat-value { font-size: 26px; font-weight: 600; letter-spacing: -0.03em; color: var(--text); }
-  .stat-value.accent { color: var(--accent); }
+/* BADGES */
+.tag{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:500;padding:2px 8px;border-radius:5px;font-family:var(--mono)}
+.tag.green{background:var(--green-dim);color:var(--green)}
+.tag.yellow{background:var(--yellow-dim);color:var(--yellow)}
+.tag.red{background:var(--red-dim);color:var(--red)}
+.tag.blue{background:var(--blue-dim);color:var(--blue)}
+.tag.gray{background:var(--surface3);color:var(--muted2)}
+.tags-row{display:flex;gap:4px}
 
-  /* ── toolbar ── */
-  .toolbar {
-    display: flex; align-items: center; gap: 8px; margin-bottom: 14px;
-  }
-  select {
-    font-family: var(--sans); font-size: 12px; font-weight: 500;
-    padding: 7px 12px; border-radius: 8px;
-    border: 1px solid var(--border2);
-    background: var(--surface2); color: var(--text);
-    cursor: pointer; outline: none;
-    appearance: none; -webkit-appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 10px center;
-    padding-right: 28px;
-  }
-  select:hover { border-color: rgba(255,255,255,0.18); }
+/* EMPTY */
+.empty{padding:48px 20px;text-align:center;color:var(--muted2)}
+.empty-icon{font-size:28px;margin-bottom:8px;opacity:.3;display:block}
 
-  .spacer { flex: 1; }
+/* MAP */
+#map{height:460px;border-radius:12px;border:1px solid var(--border);margin-bottom:16px;overflow:hidden}
+.leaflet-container{background:#0d1117}
+.map-legend{display:flex;align-items:center;gap:16px;font-size:11px;color:var(--muted2);font-family:var(--mono);flex-wrap:wrap}
+.legend-item{display:flex;align-items:center;gap:6px}
+.legend-dot{width:10px;height:10px;border-radius:50%}
 
-  .live-indicator {
-    display: flex; align-items: center; gap: 6px;
-    font-size: 11px; color: var(--muted); font-family: var(--mono);
-  }
-  .live-dot {
-    width: 6px; height: 6px; border-radius: 50%;
-    background: var(--accent);
-    animation: pulse 2s ease-in-out infinite;
-  }
+/* PAGES */
+.page{display:none}.page.active{display:block}
 
-  /* ── table ── */
-  .table-wrap {
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    overflow: hidden;
-    overflow-x: auto;
-  }
-  table { width: 100%; border-collapse: collapse; min-width: 700px; }
-  thead th {
-    text-align: left; padding: 10px 14px;
-    font-size: 10px; font-weight: 500; letter-spacing: 0.08em;
-    text-transform: uppercase; color: var(--muted);
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    white-space: nowrap;
-  }
-  tbody tr {
-    border-bottom: 1px solid var(--border);
-    transition: background 0.1s;
-  }
-  tbody tr:last-child { border-bottom: none; }
-  tbody tr:hover { background: var(--surface2); }
-  tbody td {
-    padding: 10px 14px;
-    color: var(--text);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 160px;
-  }
-  .mono { font-family: var(--mono); font-size: 12px; }
-  .muted { color: var(--muted); }
+/* USER CELL */
+.user-cell{display:flex;align-items:center;gap:8px}
+.avatar{width:26px;height:26px;border-radius:50%;background:var(--surface3);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:var(--muted2);flex-shrink:0}
 
-  /* ── badges ── */
-  .badge {
-    display: inline-flex; align-items: center; gap: 4px;
-    font-size: 11px; font-weight: 500; padding: 2px 8px;
-    border-radius: 6px; font-family: var(--mono);
-  }
-  .badge-green { background: var(--accent-dim); color: var(--accent); }
-  .badge-yellow { background: var(--warn-dim); color: var(--warn); }
-  .badge-red { background: var(--danger-dim); color: var(--danger); }
-  .badge-blue { background: rgba(96,165,250,0.12); color: var(--blue); }
-  .badge-gray { background: rgba(255,255,255,0.06); color: var(--muted); }
-
-  /* ── empty / error state ── */
-  .empty-row td {
-    padding: 48px 20px !important;
-    text-align: center;
-    color: var(--muted);
-  }
-  .empty-icon { font-size: 28px; margin-bottom: 8px; opacity: 0.3; }
-
-  /* ── user avatar ── */
-  .user-cell { display: flex; align-items: center; gap: 8px; }
-  .avatar {
-    width: 26px; height: 26px; border-radius: 50%;
-    background: var(--surface2); border: 1px solid var(--border2);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 10px; font-weight: 600; color: var(--muted);
-    flex-shrink: 0; text-transform: uppercase;
-  }
-
-  @media (max-width: 640px) {
-    .stats { grid-template-columns: repeat(2, 1fr); }
-    .topbar-right .last-update { display: none; }
-  }
+@media(max-width:768px){
+  .sidebar{width:60px}
+  .logo-name,.logo-sub,.nav-item span,.nav-badge,.sidebar-footer{display:none}
+  .nav-item{justify-content:center;padding:10px}
+  .main{margin-left:60px}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .content{padding:16px}
+}
 </style>
 </head>
 <body>
-<div class="shell">
 
-  <!-- topbar -->
-  <div class="topbar">
-    <div class="brand">
-      <div class="brand-dot offline" id="status-dot"></div>
-      <div>
-        <div class="brand-name">Location Tracker</div>
-        <div class="brand-sub" id="status-text">connecting…</div>
-      </div>
+<aside class="sidebar">
+  <div class="logo">
+    <div class="logo-mark">
+      <div class="logo-dot off" id="logo-dot"></div>
+      <div class="logo-name">TMS</div>
     </div>
+    <div class="logo-sub">TRACKER v0.3</div>
+  </div>
+  <nav>
+    <div class="nav-item active" onclick="showPage('raw')" id="nav-raw">
+      <span class="nav-icon">📡</span><span>Raw Pings</span>
+      <span class="nav-badge" id="badge-raw">—</span>
+    </div>
+    <div class="nav-item" onclick="showPage('windows')" id="nav-windows">
+      <span class="nav-icon">🪟</span><span>Windows</span>
+      <span class="nav-badge" id="badge-windows">—</span>
+    </div>
+    <div class="nav-item" onclick="showPage('permanent')" id="nav-permanent">
+      <span class="nav-icon">🏁</span><span>Permanent</span>
+      <span class="nav-badge" id="badge-permanent">—</span>
+    </div>
+    <div class="nav-item" onclick="showPage('map')" id="nav-map">
+      <span class="nav-icon">🗺</span><span>Map</span>
+    </div>
+  </nav>
+  <div class="sidebar-footer" id="last-update">—</div>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div class="page-title" id="page-title">Raw Pings</div>
     <div class="topbar-right">
-      <span class="last-update" id="last-update"></span>
-      <button class="btn" onclick="loadData()" id="refresh-btn">
-        <svg id="refresh-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+      <div class="status-pill">
+        <div class="status-dot loading" id="status-dot"></div>
+        <span id="status-text">connecting…</span>
+      </div>
+      <button class="btn primary" onclick="loadAll()" id="refresh-btn">
+        <svg id="refresh-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
         Refresh
       </button>
     </div>
   </div>
 
-  <!-- stats -->
-  <div class="stats">
-    <div class="stat">
-      <div class="stat-label">Total pings</div>
-      <div class="stat-value accent" id="s-total">—</div>
+  <div class="content">
+    <div class="stats">
+      <div class="stat"><div class="stat-label">Raw pings</div><div class="stat-val b" id="s-raw">—</div></div>
+      <div class="stat"><div class="stat-label">5-min windows</div><div class="stat-val" id="s-windows">—</div></div>
+      <div class="stat"><div class="stat-label">Permanent rows</div><div class="stat-val g" id="s-perm">—</div></div>
+      <div class="stat"><div class="stat-label">Avg accuracy</div><div class="stat-val" id="s-acc">—</div></div>
     </div>
-    <div class="stat">
-      <div class="stat-label">Unique users</div>
-      <div class="stat-value" id="s-users">—</div>
+
+    <!-- RAW -->
+    <div class="page active" id="page-raw">
+      <div class="toolbar">
+        <select id="raw-user" onchange="renderRaw()"><option value="">All users</option></select>
+        <select id="raw-limit" onchange="loadRaw()">
+          <option value="100">100 rows</option><option value="250">250 rows</option><option value="500">500 rows</option>
+        </select>
+        <div class="spacer"></div>
+        <span style="font-size:11px;color:var(--muted2);font-family:var(--mono)">● auto 10s</span>
+      </div>
+      <div class="table-wrap"><table>
+        <thead><tr>
+          <th style="width:48px">ID</th><th style="width:130px">User</th>
+          <th style="width:105px">Latitude</th><th style="width:105px">Longitude</th>
+          <th style="width:95px">Accuracy</th><th style="width:75px">Heading</th>
+          <th style="width:65px">Type</th><th>Received</th>
+        </tr></thead>
+        <tbody id="raw-body"><tr><td colspan="8" class="empty"><span class="empty-icon">📡</span>Loading…</td></tr></tbody>
+      </table></div>
     </div>
-    <div class="stat">
-      <div class="stat-label">Live shares</div>
-      <div class="stat-value" id="s-live">—</div>
+
+    <!-- WINDOWS -->
+    <div class="page" id="page-windows">
+      <div class="toolbar">
+        <select id="win-user" onchange="renderWindows()"><option value="">All users</option></select>
+        <select id="win-filter" onchange="renderWindows()">
+          <option value="">All tags</option><option value="green">🟢 Green</option>
+          <option value="yellow">🟡 Yellow</option><option value="red">🔴 Red</option>
+        </select>
+        <div class="spacer"></div>
+      </div>
+      <div class="table-wrap"><table>
+        <thead><tr>
+          <th style="width:48px">ID</th><th style="width:130px">User</th>
+          <th style="width:90px">Tag</th><th style="width:85px">Speed</th>
+          <th style="width:105px">Latitude</th><th style="width:105px">Longitude</th>
+          <th style="width:55px">Pings</th><th style="width:70px">Merged</th><th>Window</th>
+        </tr></thead>
+        <tbody id="win-body"><tr><td colspan="9" class="empty"><span class="empty-icon">🪟</span>Loading…</td></tr></tbody>
+      </table></div>
     </div>
-    <div class="stat">
-      <div class="stat-label">Avg accuracy</div>
-      <div class="stat-value" id="s-acc">—</div>
+
+    <!-- PERMANENT -->
+    <div class="page" id="page-permanent">
+      <div class="toolbar">
+        <select id="perm-user" onchange="renderPermanent()"><option value="">All users</option></select>
+        <div class="spacer"></div>
+      </div>
+      <div class="table-wrap"><table>
+        <thead><tr>
+          <th style="width:48px">ID</th><th style="width:130px">User</th>
+          <th style="width:120px">Tags</th><th style="width:90px">Avg Speed</th>
+          <th style="width:105px">Latitude</th><th style="width:105px">Longitude</th><th>Period</th>
+        </tr></thead>
+        <tbody id="perm-body"><tr><td colspan="7" class="empty"><span class="empty-icon">🏁</span>Loading…</td></tr></tbody>
+      </table></div>
+    </div>
+
+    <!-- MAP -->
+    <div class="page" id="page-map">
+      <div class="toolbar">
+        <select id="map-user" onchange="renderMap()"><option value="">All users</option></select>
+        <select id="map-source" onchange="renderMap()">
+          <option value="raw">Raw pings</option>
+          <option value="windows">5-min windows</option>
+          <option value="permanent">Permanent</option>
+        </select>
+      </div>
+      <div id="map"></div>
+      <div class="map-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>Green ≤10m</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--yellow)"></div>Yellow 11–30m</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div>Red >30m</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div>No data</div>
+      </div>
     </div>
   </div>
-
-  <!-- toolbar -->
-  <div class="toolbar">
-    <select id="user-filter" onchange="loadData()">
-      <option value="">All users</option>
-    </select>
-    <select id="limit-select" onchange="loadData()">
-      <option value="50">50 rows</option>
-      <option value="100">100 rows</option>
-      <option value="250">250 rows</option>
-      <option value="500">500 rows</option>
-    </select>
-    <div class="spacer"></div>
-    <div class="live-indicator">
-      <div class="live-dot"></div>
-      auto-refresh 10s
-    </div>
-  </div>
-
-  <!-- table -->
-  <div class="table-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th style="width:48px">ID</th>
-          <th style="width:130px">User</th>
-          <th style="width:110px">Latitude</th>
-          <th style="width:110px">Longitude</th>
-          <th style="width:100px">Accuracy</th>
-          <th style="width:80px">Heading</th>
-          <th style="width:70px">Type</th>
-          <th>Received</th>
-        </tr>
-      </thead>
-      <tbody id="table-body">
-        <tr class="empty-row"><td colspan="8">
-          <div class="empty-icon">📡</div>
-          Loading…
-        </td></tr>
-      </tbody>
-    </table>
-  </div>
-
-</div>
+</main>
 
 <script>
-const SUPABASE_URL = 'https://hmvuqjirebjvvqholmzi.supabase.co';
-const ANON_KEY     = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhtdnVxamlyZWJqdnZxaG9sbXppIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkwNDAxMjMsImV4cCI6MjA5NDYxNjEyM30.H9pDPBJUw8Hu591BOQuTF2PQz-CrphsOKIAg_t6xdn8';
+const SUPABASE_URL='https://hmvuqjirebjvvqholmzi.supabase.co';
+const ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhtdnVxamlyZWJqdnZxaG9sbXppIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkwNDAxMjMsImV4cCI6MjA5NDYxNjEyM30.H9pDPBJUw8Hu591BOQuTF2PQz-CrphsOKIAg_t6xdn8';
+const H={'apikey':ANON_KEY,'Authorization':'Bearer '+ANON_KEY};
+let rawData=[],winData=[],permData=[],mapInstance=null,mapLayers=[];
 
-const headers = { 'apikey': ANON_KEY, 'Authorization': 'Bearer ' + ANON_KEY };
+const q=id=>document.getElementById(id);
 
-function accBadge(v) {
-  if (v == null) return '<span class="muted">—</span>';
-  if (v <= 10)  return `<span class="badge badge-green">▲ ${v.toFixed(1)}m</span>`;
-  if (v <= 30)  return `<span class="badge badge-yellow">◆ ${v.toFixed(1)}m</span>`;
-  return             `<span class="badge badge-red">▼ ${v.toFixed(1)}m</span>`;
+function fmtUser(r){
+  const u=r.username?'@'+r.username:[r.first_name,r.last_name].filter(Boolean).join(' ')||String(r.telegram_user_id);
+  return{label:u,init:u.replace('@','').slice(0,2).toUpperCase()};
+}
+function fmtTime(ts){if(!ts)return'—';return new Date(ts).toLocaleString(undefined,{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'})}
+function fmtSpan(s,e){if(!s||!e)return'—';return new Date(s).toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'})+' → '+new Date(e).toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'})}
+function accBadge(v){if(v==null)return'<span class="tag blue">?</span>';if(v>300)return`<span class="tag red">▼${v}m</span>`;if(v<=10)return`<span class="tag green">▲${v}m</span>`;if(v<=30)return`<span class="tag yellow">◆${v}m</span>`;return`<span class="tag red">▼${v}m</span>`}
+function tagBadge(t){const m={green:'<span class="tag green">●</span>',yellow:'<span class="tag yellow">●</span>',red:'<span class="tag red">●</span>'};return m[t]||'<span class="tag gray">—</span>'}
+function userCell(r){const u=fmtUser(r);return`<div class="user-cell"><div class="avatar">${u.init}</div><span>${u.label}</span></div>`}
+function accColor(a){if(a==null)return'#4da6ff';if(a<=10)return'#3dd68c';if(a<=30)return'#f5c842';return'#f0544f'}
+function tagColor(t){return{green:'#3dd68c',yellow:'#f5c842',red:'#f0544f'}[t]||'#4da6ff'}
+
+const pageTitles={raw:'Raw Pings',windows:'5-Min Windows',permanent:'Permanent Records',map:'Location Map'};
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  q('page-'+name).classList.add('active');
+  q('nav-'+name).classList.add('active');
+  q('page-title').textContent=pageTitles[name];
+  if(name==='map')initMap();
 }
 
-function fmtUser(r) {
-  if (r.username)   return { label: '@' + r.username,   initials: r.username.slice(0,2).toUpperCase() };
-  const name = [r.first_name, r.last_name].filter(Boolean).join(' ');
-  if (name) return { label: name, initials: name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase() };
-  return { label: String(r.telegram_user_id), initials: '??' };
+async function fetchTable(table,params=''){
+  const res=await fetch(`${SUPABASE_URL}/rest/v1/${table}?${params}`,{headers:H});
+  if(!res.ok)throw new Error('HTTP '+res.status);
+  return res.json();
 }
 
-function fmtTime(ts) {
-  if (!ts) return '—';
-  return new Date(ts).toLocaleString(undefined, {
-    month:'short', day:'numeric',
-    hour:'2-digit', minute:'2-digit', second:'2-digit'
-  });
-}
+async function loadRaw(){rawData=await fetchTable('tg_bot_phase1_raw_locations',`select=*&order=received_at.desc&limit=${q('raw-limit')?.value||100}`);renderRaw()}
+async function loadWindows(){winData=await fetchTable('tg_bot_phase2_windows','select=*&order=window_start.desc&limit=200');renderWindows()}
+async function loadPermanent(){permData=await fetchTable('tg_bot_phase3_permanent','select=*&order=period_start.desc&limit=200');renderPermanent()}
 
-async function loadData() {
-  const dot  = document.getElementById('status-dot');
-  const icon = document.getElementById('refresh-icon');
-  dot.className = 'brand-dot loading';
-  icon.classList.add('spinning');
-
-  const limit  = document.getElementById('limit-select').value;
-  const userId = document.getElementById('user-filter').value;
-
-  let url = `${SUPABASE_URL}/rest/v1/tg_bot_phase1_raw_locations?select=*&order=received_at.desc&limit=${limit}`;
-  if (userId) url += `&telegram_user_id=eq.${userId}`;
-
-  try {
-    const res = await fetch(url, { headers });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const data = await res.json();
-
-    renderTable(data);
-    updateStats(data);
-    updateUserFilter(data, userId);
-
-    dot.className = 'brand-dot';
-    document.getElementById('status-text').textContent = 'Connected · ping-collector';
-    document.getElementById('last-update').textContent = 'Updated ' + new Date().toLocaleTimeString();
-  } catch(e) {
-    dot.className = 'brand-dot offline';
-    document.getElementById('status-text').textContent = 'Error: ' + e.message;
-    document.getElementById('table-body').innerHTML =
-      `<tr class="empty-row"><td colspan="8"><div class="empty-icon">⚠️</div>${e.message}</td></tr>`;
+async function loadAll(){
+  const dot=q('status-dot'),icon=q('refresh-icon');
+  dot.className='status-dot loading';icon.classList.add('spinning');
+  try{
+    await Promise.all([loadRaw(),loadWindows(),loadPermanent()]);
+    updateStats();syncUserFilters();
+    dot.className='status-dot on';
+    q('status-text').textContent='Connected · ping-collector';
+    q('logo-dot').className='logo-dot';
+    q('last-update').textContent='↻ '+new Date().toLocaleTimeString();
+  }catch(e){
+    dot.className='status-dot';q('status-text').textContent='Error: '+e.message;
+    q('logo-dot').className='logo-dot off';
   }
-
   icon.classList.remove('spinning');
 }
 
-function renderTable(rows) {
-  const tbody = document.getElementById('table-body');
-  if (!rows.length) {
-    tbody.innerHTML = '<tr class="empty-row"><td colspan="8"><div class="empty-icon">📡</div>No pings yet — share a live location with the bot!</td></tr>';
-    return;
+function updateStats(){
+  q('s-raw').textContent=rawData.length.toLocaleString();
+  q('s-windows').textContent=winData.length.toLocaleString();
+  q('s-perm').textContent=permData.length.toLocaleString();
+  const acc=rawData.filter(r=>r.horizontal_accuracy!=null);
+  q('s-acc').textContent=acc.length?(acc.reduce((s,r)=>s+r.horizontal_accuracy,0)/acc.length).toFixed(1)+'m':'—';
+  q('badge-raw').textContent=rawData.length;
+  q('badge-windows').textContent=winData.length;
+  q('badge-permanent').textContent=permData.length;
+}
+
+function syncUserFilters(){
+  const users={};
+  rawData.forEach(r=>{if(!users[r.telegram_user_id])users[r.telegram_user_id]=fmtUser(r).label});
+  ['raw-user','win-user','perm-user','map-user'].forEach(id=>{
+    const sel=q(id);if(!sel)return;
+    const cur=sel.value;
+    sel.innerHTML='<option value="">All users</option>'+Object.entries(users).map(([id,name])=>`<option value="${id}" ${id==cur?'selected':''}>${name}</option>`).join('');
+  });
+}
+
+function renderRaw(){
+  const uid=q('raw-user').value;
+  const rows=uid?rawData.filter(r=>String(r.telegram_user_id)===uid):rawData;
+  const tbody=q('raw-body');
+  if(!rows.length){tbody.innerHTML=`<tr><td colspan="8" class="empty"><span class="empty-icon">📡</span>No pings yet</td></tr>`;return}
+  tbody.innerHTML=rows.map(r=>`<tr>
+    <td class="mono dim">${r.id}</td><td>${userCell(r)}</td>
+    <td class="mono">${r.latitude.toFixed(5)}</td><td class="mono">${r.longitude.toFixed(5)}</td>
+    <td>${accBadge(r.horizontal_accuracy)}</td>
+    <td class="mono dim">${r.heading!=null?r.heading+'°':'—'}</td>
+    <td>${r.is_live?'<span class="tag blue">live</span>':'<span class="tag gray">static</span>'}</td>
+    <td class="mono dim" style="font-size:11px">${fmtTime(r.received_at)}</td>
+  </tr>`).join('');
+}
+
+function renderWindows(){
+  const uid=q('win-user').value,tag=q('win-filter').value;
+  let rows=winData;
+  if(uid)rows=rows.filter(r=>String(r.telegram_user_id)===uid);
+  if(tag)rows=rows.filter(r=>r.accuracy_tag===tag);
+  const tbody=q('win-body');
+  if(!rows.length){tbody.innerHTML=`<tr><td colspan="9" class="empty"><span class="empty-icon">🪟</span>No windows yet — bot needs to flush a 5-min batch first</td></tr>`;return}
+  tbody.innerHTML=rows.map(r=>`<tr>
+    <td class="mono dim">${r.id}</td><td>${userCell(r)}</td>
+    <td>${tagBadge(r.accuracy_tag)}<span class="dim mono" style="font-size:11px;margin-left:4px">${r.accuracy_tag}</span></td>
+    <td class="mono">${r.speed_mph!=null?r.speed_mph.toFixed(1)+' mph':'—'}</td>
+    <td class="mono">${r.latitude.toFixed(5)}</td><td class="mono">${r.longitude.toFixed(5)}</td>
+    <td class="mono dim">${r.ping_count}</td>
+    <td>${r.merged_into?`<span class="tag green">#${r.merged_into}</span>`:'<span class="tag gray">no</span>'}</td>
+    <td class="mono dim" style="font-size:11px">${fmtSpan(r.window_start,r.window_end)}</td>
+  </tr>`).join('');
+}
+
+function renderPermanent(){
+  const uid=q('perm-user').value;
+  const rows=uid?permData.filter(r=>String(r.telegram_user_id)===uid):permData;
+  const tbody=q('perm-body');
+  if(!rows.length){tbody.innerHTML=`<tr><td colspan="7" class="empty"><span class="empty-icon">🏁</span>No permanent records yet — need 3 windows to merge</td></tr>`;return}
+  tbody.innerHTML=rows.map(r=>`<tr>
+    <td class="mono dim">${r.id}</td><td>${userCell(r)}</td>
+    <td><div class="tags-row">${tagBadge(r.window1_tag)}${tagBadge(r.window2_tag)}${tagBadge(r.window3_tag)}</div></td>
+    <td class="mono">${r.speed_mph!=null?r.speed_mph.toFixed(1)+' mph':'—'}</td>
+    <td class="mono">${r.latitude.toFixed(5)}</td><td class="mono">${r.longitude.toFixed(5)}</td>
+    <td class="mono dim" style="font-size:11px">${fmtSpan(r.period_start,r.period_end)}</td>
+  </tr>`).join('');
+}
+
+function initMap(){
+  if(mapInstance)return;
+  mapInstance=L.map('map');
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'© OpenStreetMap © CARTO',maxZoom:19}).addTo(mapInstance);
+  renderMap();
+}
+
+function renderMap(){
+  if(!mapInstance)return;
+  mapLayers.forEach(l=>mapInstance.removeLayer(l));mapLayers=[];
+  const uid=q('map-user').value,source=q('map-source').value;
+  let points=[];
+
+  if(source==='raw'){
+    let rows=uid?rawData.filter(r=>String(r.telegram_user_id)===uid):rawData;
+    const coords=[...rows].reverse().map(r=>[r.latitude,r.longitude]);
+    if(coords.length>1){const l=L.polyline(coords,{color:'rgba(77,166,255,0.2)',weight:1.5}).addTo(mapInstance);mapLayers.push(l)}
+    rows.forEach(r=>{
+      const c=L.circleMarker([r.latitude,r.longitude],{radius:4,fillColor:accColor(r.horizontal_accuracy),color:'transparent',fillOpacity:.8})
+        .bindPopup(`<b>${fmtUser(r).label}</b><br>Acc: ${r.horizontal_accuracy??'?'}m<br>${fmtTime(r.received_at)}`);
+      c.addTo(mapInstance);mapLayers.push(c);points.push([r.latitude,r.longitude]);
+    });
+  } else if(source==='windows'){
+    let rows=uid?winData.filter(r=>String(r.telegram_user_id)===uid):winData;
+    const coords=[...rows].reverse().map(r=>[r.latitude,r.longitude]);
+    if(coords.length>1){const l=L.polyline(coords,{color:'rgba(255,255,255,0.1)',weight:1.5,dashArray:'4'}).addTo(mapInstance);mapLayers.push(l)}
+    rows.forEach(r=>{
+      const c=L.circleMarker([r.latitude,r.longitude],{radius:8,fillColor:tagColor(r.accuracy_tag),color:tagColor(r.accuracy_tag),weight:2,fillOpacity:.7})
+        .bindPopup(`<b>${r.accuracy_tag.toUpperCase()}</b><br>${r.speed_mph!=null?r.speed_mph.toFixed(1)+' mph':'?'} · ${r.ping_count} pings<br>${fmtSpan(r.window_start,r.window_end)}`);
+      c.addTo(mapInstance);mapLayers.push(c);points.push([r.latitude,r.longitude]);
+    });
+  } else {
+    let rows=uid?permData.filter(r=>String(r.telegram_user_id)===uid):permData;
+    rows.forEach(r=>{
+      const c=L.circleMarker([r.latitude,r.longitude],{radius:10,fillColor:'#4da6ff',color:'#4da6ff',weight:2,fillOpacity:.7})
+        .bindPopup(`<b>${r.speed_mph!=null?r.speed_mph.toFixed(1)+' mph':'?'}</b><br>${r.window1_tag} / ${r.window2_tag} / ${r.window3_tag}<br>${fmtSpan(r.period_start,r.period_end)}`);
+      c.addTo(mapInstance);mapLayers.push(c);points.push([r.latitude,r.longitude]);
+    });
   }
-  tbody.innerHTML = rows.map(r => {
-    const u = fmtUser(r);
-    return `<tr>
-      <td class="mono muted">${r.id}</td>
-      <td><div class="user-cell"><div class="avatar">${u.initials}</div><span style="font-size:13px">${u.label}</span></div></td>
-      <td class="mono">${r.latitude.toFixed(5)}</td>
-      <td class="mono">${r.longitude.toFixed(5)}</td>
-      <td>${accBadge(r.horizontal_accuracy)}</td>
-      <td class="mono muted">${r.heading != null ? r.heading + '°' : '—'}</td>
-      <td>${r.is_live
-        ? '<span class="badge badge-blue">live</span>'
-        : '<span class="badge badge-gray">static</span>'}</td>
-      <td class="mono muted" style="font-size:12px">${fmtTime(r.received_at)}</td>
-    </tr>`;
-  }).join('');
+  if(points.length)mapInstance.fitBounds(L.latLngBounds(points),{padding:[30,30]});
 }
 
-function updateStats(rows) {
-  document.getElementById('s-total').textContent = rows.length.toLocaleString();
-  document.getElementById('s-users').textContent = new Set(rows.map(r => r.telegram_user_id)).size;
-  document.getElementById('s-live').textContent  = rows.filter(r => r.is_live).length;
-  const acc = rows.filter(r => r.horizontal_accuracy != null);
-  document.getElementById('s-acc').textContent   = acc.length
-    ? (acc.reduce((s,r) => s + r.horizontal_accuracy, 0) / acc.length).toFixed(1) + 'm'
-    : '—';
-}
-
-function updateUserFilter(rows, current) {
-  const sel = document.getElementById('user-filter');
-  const seen = {};
-  rows.forEach(r => { if (!seen[r.telegram_user_id]) seen[r.telegram_user_id] = fmtUser(r).label; });
-  sel.innerHTML = '<option value="">All users</option>' +
-    Object.entries(seen).map(([id, name]) =>
-      `<option value="${id}" ${id == current ? 'selected' : ''}>${name}</option>`
-    ).join('');
-}
-
-loadData();
-setInterval(loadData, 10000);
+loadAll();
+setInterval(loadAll,10000);
 </script>
 </body>
 </html>
